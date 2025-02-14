@@ -1,0 +1,10 @@
+version: "3.8"
+services:
+  chunk_processor:
+    build: ./chunk_processor
+    ports:
+      - "8080:8080"
+    environment:
+      - UPLOAD_BUCKET=your-gcs-upload-bucket
+      - CHUNK_BUCKET=your-gcs-chunk-bucket
+      - MANIFEST_BUCKET=your-gcs-manifest-bucket
