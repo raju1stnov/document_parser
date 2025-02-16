@@ -1,10 +1,16 @@
 version: "3.8"
 services:
-  chunk_processor:
-    build: ./chunk_processor
+  uploader_processor:
+    build: ./uploader_processor
+    container_name: uploader_processor
     ports:
       - "8080:8080"
     environment:
-      - UPLOAD_BUCKET=your-gcs-upload-bucket
-      - CHUNK_BUCKET=your-gcs-chunk-bucket
-      - MANIFEST_BUCKET=your-gcs-manifest-bucket
+      - SOURCE_BUCKET=your-source-bucket
+      - CHUNK_SIZE_MB=50  # Splits file into 50MB chunks if above this threshold
+    # If you need service accounts or GCP authentication, mount credentials here:
+    # volumes:
+    #   - /path/to/service_account.json:/app/service_account.json
+    #   - type: bind
+    #     source: /path/to/.config/gcloud/application_default_credentials.json
+    #     target: /root/.config/gcloud/application_default_credentials.json

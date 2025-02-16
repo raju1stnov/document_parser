@@ -1,0 +1,54 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.egg-info/
+
+# Ignore VSCode workspace settings
+.vscode/
+*.code-workspace
+
+# Ignore backup files (your specific `*.bkp` files)
+*.bkp
+*.bak
+*~
+*.tmp
+*.log
+
+# Ignore Draw.io auto-backup files
+*.drawio.bkp
+
+# Ignore temp diagrams and Mermaid generated files
+*.drawio
+*.txt
+
+# Ignore any unwanted generated files
+*.out
+*.DS_Store
+Thumbs.db
+
+# Ignore Docker build cache & volumes
+docker-compose.override.yml
+.env
+*.env
+.dockerignore
+
+# Ignore GCP service account keys (ensure security)
+*.json
+service_account.json
+credentials.json
+
+# Ignore Python virtual environments (if using venv)
+venv/
+env/
+
+# Ignore compiled binaries (if any)
+bin/
+build/
+dist/
+
+# Ignore any other temporary files
+tmp/
