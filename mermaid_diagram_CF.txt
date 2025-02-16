@@ -1,0 +1,66 @@
+flowchart TD
+
+    subgraph A[Chunk Processor Service]
+        A1((Uploaded Document)) -->|Check File Size| A2{Size > 50MB?}
+        A2 -- Yes --> A3(Split into Chunks)
+        A2 -- No --> A4(Rename & Upload)
+        A3 -->|manifest + chunked pdfs| B[[SOURCE_BUCKET/<folder_uuid>]]
+        A4 -->|single file + manifest| B
+    end
+
+    B --> C[LRO Starter Cloud Function]
+    C -->|Check Manifest| C1{Multiple Chunks?}
+    
+    C1 -- Yes --> C2[Check all chunks?]
+    C2 -- No --> C4[Wait for more uploads]  -- Wait --> C
+    C2 -- Yes --> D{{Start LRO: Document AI Batch Processing}}
+
+    C1 -- No --> C3[Process Single File]
+    C3 -->|Document AI Process| D1((Structured Output))
+    
+    D -->|structured_data| E[[OUTPUT_BUCKET/structured_data/<folder_uuid>]]
+    D -->|metadata: LRO id| F[[OUTPUT_BUCKET/metadata/<folder_uuid>]]
+
+    subgraph "Retry / Exponential Backoff"
+        C5((start_lro)) --> C6{Error?}
+        C6 -- Yes --> C5
+    end
+
+    %% NEW: Chunking Details
+    E --> G[Chunker CF Transforms Structured Data]
+    
+    subgraph "Chunking (Step 3.1) - Fault Tolerant"
+        G1((Trigger: Structured Data)) --> G2{Check Checkpoint}
+        
+        G2 -- "Chunks exist?" --> G3[Skip Existing Chunks]
+        G2 -- "No chunks found" --> G4[Start Chunking]
+
+        G4 -->|Create chunks| G5[Write to /chunks/]
+        G5 -->|Update Checkpoint| G6[Store chunks_metadata.json]
+        G6 -->|New Chunk Ready| H[[OUTPUT_BUCKET/structured_data/<folder_uuid>/chunks/]]
+
+        %% Handling Failures
+        G4 --> G7{Error?}
+        G7 -- "Retry" --> G4
+        G7 -- "If crash, resume from checkpoint" --> G2
+    end
+
+    %% NEW: Embedding Details
+    H --> I[Embedder CF Embeds + Indexes]
+    
+    subgraph "Embedding (Step 3.2) - Fault Tolerant"
+        I1((Trigger: New Chunk File)) --> I2{Check If Already Indexed}
+        
+        I2 -- "Already embedded" --> I3[Skip Chunk]
+        I2 -- "Not indexed yet" --> I4[Generate Embedding]
+
+        I4 -->|Store in VectorDB| I5[ChromaDB]
+        I5 -->|Update Checkpoint| I6[Store embeddings_metadata.json]
+        
+        %% Handling Failures
+        I4 --> I7{Error?}
+        I7 -- "Retry" --> I4
+        I7 -- "If crash, resume from checkpoint" --> I2
+    end
+
+    I5 --> J((VectorDB))

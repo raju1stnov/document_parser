@@ -21,10 +21,6 @@ __pycache__/
 # Ignore Draw.io auto-backup files
 *.drawio.bkp
 
-# Ignore temp diagrams and Mermaid generated files
-*.drawio
-*.txt
-
 # Ignore any unwanted generated files
 *.out
 *.DS_Store

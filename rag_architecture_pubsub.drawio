@@ -1,0 +1,239 @@
+<mxfile host="Electron" modified="2025-02-16T00:52:48.458Z" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/21.6.8 Chrome/114.0.5735.289 Electron/25.5.0 Safari/537.36" etag="abcfVhcBtG90kEvUOsvP" version="21.6.8" type="device">
+  <diagram name="Page-1" id="K1iN2CGBCRCByr8UfI75">
+    <mxGraphModel dx="2268" dy="820" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="hzUR-m8EArH3iYTb1_M--12" value="&lt;b&gt;&lt;font style=&quot;font-size: 17px;&quot;&gt;Processing Decision in K8s&lt;/font&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=bottom;fillColor=#dae8fc;strokeColor=#6c8ebf;" vertex="1" parent="1">
+          <mxGeometry x="-170" y="790" width="980" height="620" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-168" value="&lt;b&gt;&lt;font style=&quot;font-size: 17px;&quot;&gt;Document Uploador service&lt;/font&gt;&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;" parent="1" vertex="1">
+          <mxGeometry x="-29" y="80" width="699" height="540" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-134" value="Retry / Exponential Back off" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;verticalAlign=bottom;fontStyle=1;fontSize=15;" parent="1" vertex="1">
+          <mxGeometry x="500" y="1151" width="180" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-154" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-85" target="Ngen-1MSQVI-7FVYuGFS-87" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-156" value="manifest + chunked files" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Ngen-1MSQVI-7FVYuGFS-154" vertex="1" connectable="0">
+          <mxGeometry x="-0.18" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-85" value="Splits into Chunks" style="whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry y="421" width="119" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-87" value="GCS SOURCE_BUCKET/&lt;folder_uuid&gt;" style="whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="200" y="540" width="220" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="hzUR-m8EArH3iYTb1_M--2" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Ngen-1MSQVI-7FVYuGFS-88" target="hzUR-m8EArH3iYTb1_M--1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hzUR-m8EArH3iYTb1_M--3" value="Push subscription Event" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="hzUR-m8EArH3iYTb1_M--2">
+          <mxGeometry x="-0.0681" y="1" relative="1" as="geometry">
+            <mxPoint y="-9" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-88" value="Pub/Sub Topic" style="whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="204" y="682" width="211" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-116" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-164" target="Ngen-1MSQVI-7FVYuGFS-91" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="419.5" y="1083" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-117" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Ngen-1MSQVI-7FVYuGFS-116" vertex="1" connectable="0">
+          <mxGeometry x="-0.0839" y="-1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-128" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-164" target="Ngen-1MSQVI-7FVYuGFS-125" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="309.5" y="1155" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-143" value="yes&lt;br&gt;&lt;strong data-end=&quot;965&quot; data-start=&quot;955&quot;&gt;starts&lt;/strong&gt; the LRO" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Ngen-1MSQVI-7FVYuGFS-128" vertex="1" connectable="0">
+          <mxGeometry x="-0.2678" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-161" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" target="Ngen-1MSQVI-7FVYuGFS-159" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="220.25" y="972" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-163" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Ngen-1MSQVI-7FVYuGFS-161" vertex="1" connectable="0">
+          <mxGeometry x="-0.011" y="-2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="hzUR-m8EArH3iYTb1_M--10" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="Ngen-1MSQVI-7FVYuGFS-89" target="Ngen-1MSQVI-7FVYuGFS-164">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hzUR-m8EArH3iYTb1_M--11" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="hzUR-m8EArH3iYTb1_M--10">
+          <mxGeometry x="-0.1167" y="2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-89" value="&#xa;multiple chunks?" style="rhombus;strokeWidth=2;whiteSpace=wrap;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="219.75" y="910" width="179.5" height="124" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-166" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-91" target="Ngen-1MSQVI-7FVYuGFS-88" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="640" y="711" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-167" value="Wait" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Ngen-1MSQVI-7FVYuGFS-166" vertex="1" connectable="0">
+          <mxGeometry x="-0.4555" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-91" value="Wait for Next Chunk" style="whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="561" y="1080" width="161" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-121" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-125" target="Ngen-1MSQVI-7FVYuGFS-92" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="230" y="1231" as="sourcePoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-123" value="store LRO_id" style="edgeLabel;html=1;align=center;verticalAlign=top;resizable=0;points=[];horizontal=1;" parent="Ngen-1MSQVI-7FVYuGFS-121" vertex="1" connectable="0">
+          <mxGeometry x="-0.1272" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-92" value="OUTPUT_BUCKET/metadata/&lt;folder_uuid&gt;/&#xa;checkpoint details" style="whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="-130" y="1226" width="243" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-138" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-97" target="Ngen-1MSQVI-7FVYuGFS-137" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-97" value="GCS Output_Bucket/Structured_data/" style="whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="-118.5" y="1482" width="183" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-100" value="" style="curved=1;startArrow=none;endArrow=block;exitX=0.49938174460431656;exitY=1;entryX=0.4995144774011299;entryY=0;rounded=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-87" target="Ngen-1MSQVI-7FVYuGFS-88" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-112" value="&lt;b&gt;GCS event&lt;/b&gt;" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Ngen-1MSQVI-7FVYuGFS-100" vertex="1" connectable="0">
+          <mxGeometry x="-0.2908" y="1" relative="1" as="geometry">
+            <mxPoint y="28" as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-129" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-125" target="Ngen-1MSQVI-7FVYuGFS-97" edge="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="310" y="1370" />
+              <mxPoint x="-27" y="1370" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-130" value="structured data" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Ngen-1MSQVI-7FVYuGFS-129" vertex="1" connectable="0">
+          <mxGeometry x="-0.1161" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-135" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-125" target="Ngen-1MSQVI-7FVYuGFS-134" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-125" value="Document AI&lt;br&gt;Batch Processing" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;" parent="1" vertex="1">
+          <mxGeometry x="249.5" y="1236" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-131" value="start_LRO" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
+          <mxGeometry x="550" y="1178" width="63" height="63" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-132" value="" style="endArrow=classic;html=1;exitX=0;exitY=1;exitDx=0;exitDy=0;curved=1;entryX=0.951;entryY=0.806;entryDx=0;entryDy=0;entryPerimeter=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-131" target="Ngen-1MSQVI-7FVYuGFS-131" edge="1">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="570.0000000000001" y="1257.998" as="sourcePoint" />
+            <mxPoint x="632.7480000000002" y="1259.384" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="579.37" y="1414.71" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-133" value="error? retry" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Ngen-1MSQVI-7FVYuGFS-132" vertex="1" connectable="0">
+          <mxGeometry x="-0.7029" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-140" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-137" target="Ngen-1MSQVI-7FVYuGFS-139" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-137" value="Chunking Service&lt;br&gt;structured data" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="171" y="1477" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="hzUR-m8EArH3iYTb1_M--13" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="Ngen-1MSQVI-7FVYuGFS-139" target="Ngen-1MSQVI-7FVYuGFS-141">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-139" value="Embedding Service" style="rounded=0;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="399" y="1477" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-141" value="VectorDB" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
+          <mxGeometry x="609" y="1467" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-147" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-145" target="Ngen-1MSQVI-7FVYuGFS-146" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-145" value="Upload Document" style="ellipse;whiteSpace=wrap;html=1;aspect=fixed;" parent="1" vertex="1">
+          <mxGeometry x="266" y="111" width="82" height="82" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-148" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-146" target="Ngen-1MSQVI-7FVYuGFS-85" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-158" value="Yes" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Ngen-1MSQVI-7FVYuGFS-148" vertex="1" connectable="0">
+          <mxGeometry x="0.5449" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-150" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-146" target="Ngen-1MSQVI-7FVYuGFS-149" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-152" value="No" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Ngen-1MSQVI-7FVYuGFS-150" vertex="1" connectable="0">
+          <mxGeometry x="0.6088" y="-2" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-146" value="csize &gt; 50 MB" style="rhombus;strokeWidth=2;whiteSpace=wrap;" parent="1" vertex="1">
+          <mxGeometry x="228.75" y="257" width="157.5" height="104" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-155" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-149" target="Ngen-1MSQVI-7FVYuGFS-87" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-157" value="single file + manifest" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="Ngen-1MSQVI-7FVYuGFS-155" vertex="1" connectable="0">
+          <mxGeometry x="-0.1993" y="1" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-149" value="Rename &amp; Upload" style="whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="490" y="421" width="119" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-162" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="Ngen-1MSQVI-7FVYuGFS-159" target="Ngen-1MSQVI-7FVYuGFS-160" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-159" value="process single file" style="whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="-70" y="955" width="161" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-160" value="GCS Output_Bucket/Structured_data/" style="whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="-81" y="1076" width="183" height="50" as="geometry" />
+        </mxCell>
+        <mxCell id="Ngen-1MSQVI-7FVYuGFS-164" value="Check All Chunks?" style="whiteSpace=wrap;strokeWidth=2;" parent="1" vertex="1">
+          <mxGeometry x="230" y="1083" width="161" height="34" as="geometry" />
+        </mxCell>
+        <mxCell id="hzUR-m8EArH3iYTb1_M--4" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="hzUR-m8EArH3iYTb1_M--1" target="Ngen-1MSQVI-7FVYuGFS-89">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="hzUR-m8EArH3iYTb1_M--5" value="Read Manifest" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" vertex="1" connectable="0" parent="hzUR-m8EArH3iYTb1_M--4">
+          <mxGeometry x="-0.1806" y="-3" relative="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="hzUR-m8EArH3iYTb1_M--1" value="FastAPI Service Kubernetes" style="whiteSpace=wrap;strokeWidth=2;" vertex="1" parent="1">
+          <mxGeometry x="228.25" y="823" width="161" height="34" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

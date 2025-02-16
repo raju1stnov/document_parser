@@ -1,0 +1,39 @@
+flowchart LR
+    subgraph A[Chunk Processor Service]
+      A1((User Uploads Document)) -->|Check File Size| A2{Size > 50MB?}
+      A2 -- Yes --> A3[Split into Chunks]
+      A2 -- No --> A4[Single File + Manifest]
+      A3 -->|Chunks + Manifest| B[[SOURCE_BUCKET/<folder_uuid>]]
+      A4 -->|Manifest + 1 chunk| B
+    end
+
+    B -->|GCS Event| P[Pub/Sub Topic]
+    P -->|Push event| C[FastAPI Service Kubernetes]
+
+    subgraph D[Processing Decision in K8s]
+      C -->|Read Manifest| D1{Multiple Chunks?}
+      D1 -- Yes --> D2[Check all chunks?]
+      D2 -- No --> D4[Wait for more uploads] -- Wait --> C
+      D2 -- Yes --> E{{Start LRO: Document AI Batch Processing}}
+
+      D1 -- No --> D3[Single File Processing]
+      D3 -->|Document AI Process| E1((Structured Output))
+    end
+
+    E -->|structured_data| F[[OUTPUT_BUCKET/structured_data/<folder_uuid>]]
+    E -->|metadata: LRO id| G[[OUTPUT_BUCKET/metadata/<folder_uuid>]]
+
+    subgraph "Retry / Exponential Backoff"
+      R1((start_lro)) -->|error? retry| R1
+    end
+
+    F --> H[Chunking Service structured data]
+    H --> I[Embedding Service]
+    I --> J((VectorDB))
+
+    style F fill:#bbb,stroke:#333,stroke-width:1px
+    style G fill:#ccc,stroke:#333,stroke-width:1px
+
+    subgraph K["Kubernetes Cluster"]
+      C
+    end
