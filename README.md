@@ -1,4 +1,35 @@
-# document_parser
+# GitHub structure 
+
+document_pipeline/
+│── docker-compose.yml         # Orchestrates services (if using containers)
+│── .gitignore                 # Prevents committing unwanted files
+│── README.md                  # Documentation for the repository
+│
+├── functions/                  # Cloud Functions for processing
+│   ├── document_parser/        # Handles document parsing via Document AI
+│   │   ├── main.py             # Cloud Function entry point for parsing
+│   │   ├── requirements.txt    # Dependencies
+│   ├── chunk_processor/        # Handles chunking of structured data
+│   │   ├── chunker.py          # Main chunking logic
+│   │   ├── main.py             # Cloud Function entry point for chunking
+│   │   ├── gcs_utils.py        # GCS helper functions
+│   │   ├── config.py           # Configuration settings
+│   │   ├── requirements.txt    # Dependencies
+│   ├── embedder/               # Handles embedding and vectorization
+│   │   ├── embedder.py         # Main embedding logic
+│   │   ├── main.py             # Cloud Function entry point for embedding
+│   │   ├── gcs_utils.py        # GCS helper functions
+│   │   ├── config.py           # Configuration settings
+│   │   ├── requirements.txt    # Dependencies
+├── uploader_processor/         # Handles file uploads, chunking, and manifest generation
+│   ├── main.py                 # FastAPI application logic
+│   ├── chunker.py              # File splitting logic (50MB default)
+│   ├── config.py               # Configuration (CHUNK_SIZE_MB, etc.)
+│   ├── gcs_utils.py            # GCS upload & manifest generation
+│   ├── requirements.txt        # Dependencies
+│   ├── Dockerfile              # Containerized deployment
+
+# Upload Processor
 
 ### Explanation of `upload_document` Logic
 
@@ -38,7 +69,6 @@ gs://SOURCE_BUCKET/
   "timestamp": "2025-02-15T15:30:02Z"
 }
 
-
 ### Run Locally (without Docker)
 
 docker-compose build uploader_processor
@@ -54,6 +84,8 @@ upload a file
 
 curl -X POST http://localhost:8080/upload -F "file=@sample.pdf"
 
+# Document Parser
+
 ## Deep Dive into Metadata Checkpointing & Retry/Exponential Backoff
 
 ### Source_bucket folder Layout
@@ -63,34 +95,14 @@ gs://SOURCE_BUCKET/
 │   ├── chunk_001.pdf
 │   ├── chunk_002.pdf
 │   ├── manifest.json  # Lists expected chunks
-
 │── pqrs-2345/  # Small document (45MB PDF, single file)
 │   ├── chunk_001.pdf
 │   ├── manifest.json  # Only one chunk mentioned
-
 │── xyz-5678/  # Large document (120MB, chunked)
 │   ├── chunk_001.pdf
 │   ├── chunk_002.pdf
 │   ├── chunk_003.pdf
-│   ├── manifest.json  # Lists all expected chunks
-
-**Example manifest.json (for `abcd-1234`)**
-
-{
-    "num_chunks": 2,
-    "chunk_files": ["chunk_001.pdf", "chunk_002.pdf"],
-    "original_filename": "large_report.pdf",
-    "file_size_mb": 90
-}
-
-**Example manifest.json (for `pqrs-2345`)**
-
-{
-    "num_chunks": 1,
-    "chunk_files": ["chunk_001.pdf"],
-    "original_filename": "small_report.pdf",
-    "file_size_mb": 45
-}
+│   ├── manifest.json  # Lists all expected source file chunks
 
 ### OUTPUT Folder Layout
 
@@ -100,35 +112,13 @@ gs://OUTPUT_BUCKET/
 │   │   ├── report_text.txt       # Full extracted text
 │   │   ├── report_entities.json  # Key-value entities (invoice amounts, dates, etc.)
 │   │   ├── report_tables.csv     # Extracted tables
-│   │   ├── chunks/               # Stores chunked text files
-│   │   │   ├── chunk_001.json
-│   │   │   ├── chunk_002.json
-│   │   │   ├── chunk_003.json
-│   │   │   ├── chunks_metadata.json  # Checkpoint file (Stores chunking progress)
-│   │   ├── embeddings/           # Stores vector embeddings
-│   │   │   ├── chunk_001.npy
-│   │   │   ├── chunk_002.npy
-│   │   │   ├── embeddings_metadata.json  # Checkpoint file (Stores embedding progress)
-│── metadata/  # Stores processing metadata (including LRO tracking)
-│   ├── abcd-1234/
-│   │   ├── report.json   # Tracks LRO status & final processing status
+│   │   ├── manifests_report.json     # metadata
 
 ### Metadata Checkpointing → Tracks LRO Progress
 
 * **Checkpointing** ensures that the system knows where it left off if there's an interruption (e.g., system crash, network failure).
 * We store **LRO progress metadata** in a GCS  **metadata folder** .
 * This helps us **resume from the last known state** instead of restarting from scratch.
-
-#### Example Scenario:
-
-##### Chunks for `report.pdf`
-
-gs://SOURCE_BUCKET/abcd-1234/  contains following files
-
-- report_chunk_1.pdf
-- report_chunk_2.pdf
-- report_chunk_3.pdf
-- manifests_report.json
 
 ##### Metadata Stored in GCS:
 
@@ -309,13 +299,6 @@ gs://OUTPUT_BUCKET/
 │   │   │   ├── chunk_003.json
 │   │   │   ├── chunks_metadata.json  # Checkpoint file
 │   │   │   ├── chunks_errors.json    # Failed chunk logs
-│   │   ├── embeddings/           # Stores vector embeddings
-│   │   │   ├── chunk_001.npy
-│   │   │   ├── chunk_002.npy
-│   │   │   ├── embeddings_metadata.json  # Checkpoint file (Stores embedding progress)
-│── metadata/  # Stores processing metadata (including LRO tracking)
-│   ├── abcd-1234/
-│   │   ├── report.json   # Tracks LRO status & final processing status
 
 ### Chunking Metadata Checkpointing
 
@@ -415,6 +398,8 @@ gs://OUTPUT_BUCKET/structured_data/
 │   │   ├── chunk_001.json
 │   │   ├── chunk_002.json
 │   │   ├── chunk_003.json
+│   │   │   ├── chunks_metadata.json  # Checkpoint file
+│   │   │   ├── chunks_errors.json    # Failed chunk logs
 │   ├── embeddings/
 │   │   ├── chunk_001.npy
 │   │   ├── chunk_002.npy
@@ -447,17 +432,17 @@ gs://OUTPUT_BUCKET/structured_data/
 
 ### How the Function Handles Failures
 
-#####  **If the CF Crashes:**
+##### **If the CF Crashes:**
 
 1. It **skips already processed embeddings** by checking `embeddings_metadata.json`.
 2. It **resumes from where it left off** instead of restarting from the beginning.
 
-#####  **If an Embedding Fails:**
+##### **If an Embedding Fails:**
 
 1. The failed chunk is  **logged in `embeddings_errors.json`** .
 2. The next execution will  **retry only failed chunks** , not everything.
 
-#####  **If Everything is Successfully Embedded:**
+##### **If Everything is Successfully Embedded:**
 
 1. The function  **exits without retrying anything** .
 2. The `embeddings_metadata.json` file is  **updated with processed chunks** .
