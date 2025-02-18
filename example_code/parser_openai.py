@@ -10,7 +10,7 @@ from google.api_core.retry import Retry
 # Configuration
 PROJECT_ID = "your-project-id"
 LOCATION = "us"  # "us" or "us-central1"
-PROCESSOR_ID = "your-processor-id"  # Layout Parser
+PROCESSOR_ID = "your-processor-id"  # Layout Parser Processor
 SOURCE_BUCKET = "my_bucket"
 SOURCE_PREFIX = "source_path/upload-164654/"
 DEST_BUCKET = "my_bucket"
@@ -20,35 +20,25 @@ DEST_PREFIX = "output_path/structured_data/upload-164654/"
 logging.basicConfig(level=logging.INFO)
 
 def guess_mime_type(filename: str) -> str:
-    """Return appropriate MIME type for PDF or known Office extensions."""
+    """Return appropriate MIME type for PDFs and Office files."""
     ext = os.path.splitext(filename)[1].lower()
-    if ext == ".pdf":
-        return "application/pdf"
-    elif ext == ".tiff":
-        return "image/tiff"
-    elif ext == ".jpg" or ext == ".jpeg":
-        return "image/jpeg"
-    elif ext == ".png":
-        return "image/png"
-    elif ext == ".doc" or ext == ".docx":
-        return "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-    elif ext == ".xls" or ext == ".xlsx":
-        return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    elif ext == ".ppt" or ext == ".pptx":
-        return "application/vnd.openxmlformats-officedocument.presentationml.presentation"
-    else:
-        return None  # not supported
+    return {
+        ".pdf": "application/pdf",
+        ".tiff": "image/tiff",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".png": "image/png",
+        ".doc": "application/msword",
+        ".docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+        ".xls": "application/vnd.ms-excel",
+        ".xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        ".ppt": "application/vnd.ms-powerpoint",
+        ".pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    }.get(ext, None)  # Returns None for unsupported types
 
 def is_synchronous_supported(mime_type: str) -> bool:
     """Return True if the given mime_type is supported by process_document()."""
-    # According to Document AI docs, synchronous parsing (process_document)
-    # supports PDF, TIFF, images. We'll treat them as sync.
-    return mime_type in (
-        "application/pdf",
-        "image/tiff",
-        "image/jpeg",
-        "image/png"
-    )
+    return mime_type in ("application/pdf", "image/tiff", "image/jpeg", "image/png")
 
 def process_documents():
     docai_client = documentai.DocumentProcessorServiceClient(
@@ -56,7 +46,7 @@ def process_documents():
     )
     storage_client = storage.Client()
 
-    # The layout parser processor name (NO :batchProcess, just the base)
+    # The layout parser processor name
     processor_name = docai_client.processor_path(PROJECT_ID, LOCATION, PROCESSOR_ID)
 
     # List files in source bucket
@@ -89,124 +79,94 @@ def process_documents():
 
         # Decide synchronous vs asynchronous
         if is_synchronous_supported(mime_type):
-            # Synchronous approach
-            logging.info(f"[SYNC] Processing {file_name} with mime: {mime_type}")
+            logging.info(f"[SYNC] Processing {file_name} (Mime: {mime_type})")
             synchronous_process(docai_client, processor_name, blob, mime_type, dest_blob)
         else:
-            # Asynchronous approach for docx, xlsx, pptx, etc.
-            logging.info(f"[ASYNC] Processing {file_name} with mime: {mime_type}")
+            logging.info(f"[ASYNC] Processing {file_name} (Mime: {mime_type})")
             asynchronous_process(docai_client, processor_name, blob, mime_type, dest_path)
 
 def synchronous_process(docai_client, processor_name, blob, mime_type, dest_blob):
     """
-    Use process_document(...) for PDF, TIFF, images, etc.
-    Immediately get Document object, upload JSON to GCS as dest_blob.
+    Use process_document(...) for PDF, TIFF, images.
+    Immediately get Document object, upload JSON to GCS.
     """
     from google.cloud.documentai_v1beta3.types import ProcessRequest, RawDocument
 
-    # Download file into memory
-    content = blob.download_as_bytes()
-    request = ProcessRequest(
-        name=processor_name,
-        raw_document=RawDocument(content=content, mime_type=mime_type)
-    )
-
     try:
+        request = ProcessRequest(
+            name=processor_name,
+            raw_document=RawDocument(content=blob.download_as_bytes(), mime_type=mime_type)
+        )
         result = docai_client.process_document(request=request)
         document = result.document
-        json_str = documentai.Document.to_json(document)
-        dest_blob.upload_from_string(data=json_str, content_type="application/json")
-        logging.info(f"Synchronous parse done. Uploaded {dest_blob.name}")
+
+        # Save JSON to GCS
+        dest_blob.upload_from_string(
+            data=documentai.Document.to_json(document),
+            content_type="application/json"
+        )
+        logging.info(f"Synchronous processing complete: {dest_blob.name}")
+
     except Exception as e:
-        logging.error(f"Synchronous parse error for {blob.name}: {e}")
+        logging.error(f"Error processing {blob.name}: {e}")
 
 @Retry(initial=1.0, maximum=60.0, multiplier=2.0, deadline=600.0)
 def asynchronous_process(docai_client, processor_name, blob, mime_type, dest_path):
     """
-    Use batch_process_documents(...) with a single doc to parse e.g. DOCX, XLSX.
-    Poll the operation, then rename the output JSON to our desired <filename>.json.
+    Use batch_process_documents(...) to handle docx, xlsx, pptx, etc.
+    Polls until completion, then moves output JSON to <filename>.json.
     """
     from google.cloud.documentai_v1beta3.types import (
-        BatchProcessRequest,
-        BatchProcessRequest_InputDocuments,
-        BatchProcessRequest_DocumentOutputConfig,
-        GcsDocuments,
-        GcsDocument,
+        BatchProcessRequest, GcsDocuments, GcsDocument, DocumentOutputConfig
     )
     storage_client = storage.Client()
 
-    # We'll do a single-document batch process for doc/docx/xls/xlsx
     doc_uri = f"gs://{blob.bucket.name}/{blob.name}"
+    output_gcs_uri = f"gs://{DEST_BUCKET}/{dest_path}.temp/"
 
-    # Output folder for doc AI - it auto-writes subfolders
-    # We'll choose a unique subfolder. For example:
-    operation_folder = dest_path + ".temp"  # e.g. "upload-164654/my_test_doc.json.temp"
-    output_gcs_uri = f"gs://{DEST_BUCKET}/{operation_folder}"
-
-    # Build the request
-    gcs_doc = GcsDocument(gcs_uri=doc_uri, mime_type=mime_type)
-    gcs_docs = GcsDocuments(documents=[gcs_doc])
-    input_docs = BatchProcessRequest_InputDocuments(gcs_documents=gcs_docs)
-
-    doc_output_config = BatchProcessRequest_DocumentOutputConfig(
-        gcs_output_config=BatchProcessRequest_DocumentOutputConfig.GcsOutputConfig(
-            gcs_uri=output_gcs_uri
-        )
+    # Prepare batch request
+    input_documents = GcsDocuments(documents=[GcsDocument(gcs_uri=doc_uri, mime_type=mime_type)])
+    document_output_config = DocumentOutputConfig(
+        gcs_output_config=DocumentOutputConfig.GcsOutputConfig(gcs_uri=output_gcs_uri)
     )
 
     request = BatchProcessRequest(
-        name=processor_name + ":batchProcess",  # we do need :batchProcess for an async
-        input_documents=input_docs,
-        document_output_config=doc_output_config,
+        name=processor_name + ":batchProcess",
+        input_documents=BatchProcessRequest.InputDocuments(gcs_documents=input_documents),
+        document_output_config=document_output_config
     )
 
     logging.info(f"Calling batch_process for {doc_uri}")
     operation = docai_client.batch_process_documents(request=request)
-
     op_name = operation.operation.name
     logging.info(f"Operation started: {op_name}")
 
-    # Wait for operation done
-    # This uses a direct approach
-    operation.result()  # blocks until done or raises error
-    logging.info(f"Async parse completed for {blob.name} -> folder {operation_folder}")
+    # Wait for completion
+    operation.result()
+    logging.info(f"Async processing completed for {blob.name}")
 
-    # Now read the auto-generated JSON from that folder, rename to <filename>.json
-    # Document AI typically writes them under something like:
-    #   <operation_folder>/0/ or <operation_folder>/1/
-    # Let's search sub-blobs
+    # Locate the output JSON in temp folder
     output_bucket = storage_client.bucket(DEST_BUCKET)
-    sub_blobs = list(output_bucket.list_blobs(prefix=operation_folder))
+    sub_blobs = list(output_bucket.list_blobs(prefix=dest_path + ".temp/"))
 
     if not sub_blobs:
-        logging.error(f"No output found under {operation_folder}")
+        logging.error(f"No output found for {blob.name}")
         return
 
-    # Typically there's a JSON with "document.json"
-    # We'll find the first "document.json" or *.json
-    doc_json_blob = None
-    for b in sub_blobs:
-        if b.name.endswith(".json"):
-            doc_json_blob = b
-            break
-
+    # Find the first JSON file
+    doc_json_blob = next((b for b in sub_blobs if b.name.endswith(".json")), None)
     if not doc_json_blob:
-        logging.error(f"No .json in {operation_folder}")
+        logging.error(f"No .json file found in async output for {blob.name}")
         return
 
-    # Download that JSON
-    json_str = doc_json_blob.download_as_text()
-
-    # Finally, upload that to our final <filename>.json path (dest_path)
+    # Move JSON to final location
     final_blob = output_bucket.blob(dest_path)
-    final_blob.upload_from_string(json_str, content_type="application/json")
-    logging.info(f"Asynchronous parse done. Wrote final JSON -> {final_blob.name}")
+    final_blob.upload_from_string(doc_json_blob.download_as_text(), content_type="application/json")
+    logging.info(f"Saved final JSON: {final_blob.name}")
 
-    # Cleanup the temp folder if desired
-    # for b in sub_blobs:
-    #    b.delete()
-    # output_bucket.delete_blobs(sub_blobs)
-    # logging.info(f"Cleaned up temp folder {operation_folder}")
+    # Cleanup temp folder
+    output_bucket.delete_blobs(sub_blobs)
+    logging.info(f"Deleted temporary async output folder for {blob.name}")
 
 def main():
     process_documents()
